@@ -27,7 +27,7 @@ function Browse() {
                     <button style={{ padding: "10px 50px", borderRadius: "8px", backgroundColor: "#6d130c", color: "white", fontWeight: "bold", cursor: "pointer" }}>
                         Back to Home
                     </button>
-                </Link>
+                 </Link>
                 <Link to="/Recipelist">
                     <button style={{ padding: "10px 50px", borderRadius: "8px", backgroundColor: "#6d130c", color: "white", fontWeight: "bold", cursor: "pointer" }}>
                         Recipe List
