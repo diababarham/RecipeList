@@ -4,7 +4,7 @@ function RecipeList() {
     return (
         <div>
             <header style={{ backgroundColor: "#6d130c", padding: "20px", color: "white" }}>
-                <h1>Select Recipes</h1>
+                <h1>Selected Recipes</h1>
             </header>
 
             <section style={{ backgroundColor: "#e5dad2", padding: "20px", textAlign: "center" }}>
