@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
+import { useSearchData } from './RecipeDataStorage';
 
 function Browse() {
+
+    const { filteredItems, query, setQuery } = useSearchData();
+    
+
     return (
         <div>
             <header style={{ backgroundColor: "#6d130c", padding: "20px", color: "white" }}>
@@ -9,17 +14,43 @@ function Browse() {
 
             <section style={{ backgroundColor: "#e5dad2", padding: "20px", textAlign: "center" }}>
                 <h2>Search for Recipe</h2>
-                <ul style={{ listStyle: "none", padding: 0 }}>
-                    <li style={{ margin: "10px 0", background: "#73955b", color: "white", padding: "10px", borderRadius: "8px" }}>
-                        Spaghetti Carbonara
-                    </li>
-                    <li style={{ margin: "10px 0", background: "#73955b", color: "white", padding: "10px", borderRadius: "8px" }}>
-                        Chicken Alfredo
-                    </li>
-                    <li style={{ margin: "10px 0", background: "#73955b", color: "white", padding: "10px", borderRadius: "8px" }}>
-                        Vegan Buddha Bowl
-                    </li>
-                </ul>
+                <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search recipes..."
+                    style={{
+                        padding: "10px",
+                        marginBottom: "20px",
+                        width: "300px",
+                        borderRadius: "8px",
+                        border: "1px solid #ccc",
+                        fontSize: "16px"
+                }}
+               
+                />
+                {filteredItems.length > 0 ? (
+                    <ul style={{ listStyle: "none", padding: 0 }}>
+                        {filteredItems.map(item => (
+                            <li
+                                key={item.id}
+                                style={{
+                                    margin: "10px 0",
+                                    background: "#73955b",
+                                    color: "white",
+                                    padding: "10px",
+                                    borderRadius: "8px"
+                                }}
+                            >
+                                {item.name}
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p style={{ color: "#666", fontStyle: "italic" }}>
+                        No recipes found. Try a different search term.
+                    </p>
+                )}
             </section>
 
             <section style={{ padding: "20px", textAlign: "center" }}>
