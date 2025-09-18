@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
+import { useSearchData } from './RecipeDataStorage';
 
 function RecipeList() {
+    const { selectedItems } = useSearchData();
     return (
         <div>
             <header style={{ backgroundColor: "#6d130c", padding: "20px", color: "white" }}>
@@ -8,12 +10,27 @@ function RecipeList() {
             </header>
 
             <section style={{ backgroundColor: "#e5dad2", padding: "20px", textAlign: "center" }}>
-                <h2>Here are the recipes you have selected</h2>
-                <ul style={{ listStyle: "none", padding: 0 }}>
-                    <li style={{ margin: "10px 0", background: "#73955b", color: "white", padding: "10px", borderRadius: "8px" }}>
-                        Spaghetti Carbonara
-                    </li>
-                </ul>
+                <h2>Your Selected Recipes</h2>
+                {selectedItems.length > 0 ? (
+                    <ul style={{ listStyle: "none", padding: 0 }}>
+                        {selectedItems.map(item => (
+                            <li
+                                key={item.id}
+                                style={{
+                                    margin: "10px 0",
+                                    background: "#73955b",
+                                    color: "white",
+                                    padding: "10px",
+                                    borderRadius: "8px",
+                                }}
+                            >
+                                {item.name}
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                        <p>No recipes selected. Go to the Browse page to add some!</p>
+                )}
             </section>
 
             <section style={{ padding: "20px", textAlign: "center" }}>

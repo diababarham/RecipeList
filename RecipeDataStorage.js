@@ -19,10 +19,31 @@ export function useSearchData() {
 	// search query state
 	const [query, setQuery] = useState('');
 
+	//selected Recipes State
+    const [selectedItems, setSelectedItems] = useState([]);
+
 	// filtered items based on search query
 	const filteredItems = items.filter(item =>
 		item.name.toLowerCase().includes(query.toLowerCase()))
 		.slice(0, 5); // limit to 5 results
 
-	return {items, filteredItems, query, setQuery};
+	//add a recipe to selected items/recipes
+	const addToSelected = (item) => {
+		setSelectedItems(prev =>
+			prev.some(selected => selected.id === item.id)
+				? prev
+				: [...prev, item]
+		);
+	};
+
+	const removeFromSelected = (id) => {
+		setSelectedItems(prev => prev.filter(item => item.id !== id));
+    }
+
+	return {
+		items, filteredItems, query, setQuery,
+		selectedItems,
+		addToSelected,
+		removeFromSelected
+};
 }

@@ -3,7 +3,7 @@ import { useSearchData } from './RecipeDataStorage';
 
 function Browse() {
 
-    const { filteredItems, query, setQuery } = useSearchData();
+    const { filteredItems, query, setQuery, addToSelected, selectedItems } = useSearchData();
     
 
     return (
@@ -39,10 +39,27 @@ function Browse() {
                                     background: "#73955b",
                                     color: "white",
                                     padding: "10px",
-                                    borderRadius: "8px"
+                                    borderRadius: "8px",
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center"
                                 }}
                             >
-                                {item.name}
+                                <span>{item.name}</span>
+                                <button
+                                    onClick={() => addToSelected(item)}
+                                    disabled={selectedItems.some(selected => selected.id === item.id)} 
+                                    style={{
+                                        padding: "5px 10px",
+                                        borderRadius: "5px",
+                                        backgroundColor: selectedItems.some(selected => selected.id === item.id) ? "#ccc" : "#6d130c",
+                                        color: "white",
+                                        cursor: selectedItems.some(selected => selected.id === item.id) ? "not-allowed" : "pointer"
+                                        
+                                    }}
+                                >
+                                    {selectedItems.some(selected => selected.id === item.id) ? "Added" : "Add to List"}
+                                </button>
                             </li>
                         ))}
                     </ul>
