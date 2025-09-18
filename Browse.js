@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
-import { useSearchData } from './RecipeDataStorage';
+
+import { useSearchContext } from './SearchContext';
+
 
 function Browse() {
 
-    const { filteredItems, query, setQuery, addToSelected, selectedItems } = useSearchData();
+    const { filteredItems, query, setQuery, addToSelected, selectedItems } = useSearchContext();
     
 
     return (

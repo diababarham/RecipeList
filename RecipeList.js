@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { useSearchData } from './RecipeDataStorage';
+import { useSearchContext } from './SearchContext';
 
 function RecipeList() {
-    const { selectedItems } = useSearchData();
+    const { selectedItems } = useSearchContext();
+
     return (
         <div>
             <header style={{ backgroundColor: "#6d130c", padding: "20px", color: "white" }}>
@@ -29,7 +30,7 @@ function RecipeList() {
                         ))}
                     </ul>
                 ) : (
-                        <p>No recipes selected. Go to the Browse page to add some!</p>
+                        <p style={{ color: "#666", fontStyle: "italic" }}>No recipes selected. Go to the Browse page to add some!</p>
                 )}
             </section>
 
