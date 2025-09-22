@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import { useSearchContext } from './SearchContext';
+import IngredientList from './IngredientList';
+import { useState } from 'react';
 
 function RecipeList() {
     const { selectedItems } = useSearchContext();
+    const [showIngredients, setShowIngredients] = useState(false);
 
     return (
         <div>
@@ -32,6 +35,23 @@ function RecipeList() {
                 ) : (
                         <p style={{ color: "#666", fontStyle: "italic" }}>No recipes selected. Go to the Browse page to add some!</p>
                 )}
+                {selectedItems.length > 0 && (
+                    <button
+                        onClick={() => setShowIngredients(!showIngredients)}
+                        style={{
+                            padding: "10px 20px",
+                            marginTop: "20px",
+                            borderRadius: "8px",
+                            backgroundColor: "#6d130c",
+                            color: "white",
+                            fontWeight: "bold",
+                            cursor: "pointer"
+                        }}
+                    >
+                        {showIngredients ? "Hide Ingredients" : "Show Ingredients"}
+                    </button>
+                )}
+                {showIngredients && <IngredientList selectedItems={selectedItems} />}
             </section>
 
             <section style={{ padding: "20px", textAlign: "center" }}>
