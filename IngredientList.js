@@ -1,15 +1,25 @@
 function IngredientList({ selectedItems }) {
-    // Combine ingredients from all selected recipes and remove duplicates
-    const allIngredients = [...new Set(
-        selectedItems.flatMap(item => item.ingredients || [])
-    )].sort();
+    // Combine ingredients, summing quantities for duplicates
+    const combinedIngredients = selectedItems
+        .flatMap(item => item.ingredients || [])
+        .reduce((acc, { name, quantity }) => {
+            const existing = acc.find(ing => ing.name === name);
+            if (existing) {
+                // For simplicity, concatenate quantities (e.g., "200g + 100g")
+                existing.quantity = `${existing.quantity}, ${quantity}`;
+            } else {
+                acc.push({ name, quantity });
+            }
+            return acc;
+        }, [])
+        .sort((a, b) => a.name.localeCompare(b.name));
 
     return (
         <div style={{ marginTop: "20px" }}>
             <h3>Ingredients for Selected Recipes</h3>
-            {allIngredients.length > 0 ? (
+            {combinedIngredients.length > 0 ? (
                 <ul style={{ listStyle: "none", padding: 0 }}>
-                    {allIngredients.map((ingredient, index) => (
+                    {combinedIngredients.map((ingredient, index) => (
                         <li
                             key={index}
                             style={{
@@ -20,7 +30,7 @@ function IngredientList({ selectedItems }) {
                                 borderRadius: "5px"
                             }}
                         >
-                            {ingredient}
+                            {ingredient.name}: {ingredient.quantity}
                         </li>
                     ))}
                 </ul>
