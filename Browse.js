@@ -5,8 +5,36 @@ import { useSearchContext } from './SearchContext';
 
 function Browse() {
 
-    const { filteredItems, query, setQuery, addToSelected, selectedItems } = useSearchContext();
-    
+    const { filteredItems, query, setQuery, addToSelected, selectedItems, loading, error } = useSearchContext();
+
+    if (loading) {
+        return (
+            <div style={{ padding: "20px", textAlign: "center" }}>
+                <p>Loading Recipes....</p>
+            </div>
+        );
+    }
+    if (error) {
+        return (
+            <div style={{ padding: "20px", textAlign: "center", color: "#d32f2f" }}>
+                <p>{error}</p>
+                <button
+                    onClick={() => window.location.reload()}
+                    style={{
+                        padding: "10px 20px",
+                        borderRadius: "8px",
+                        backgroundColor: "#6d130c",
+                        color: "white",
+                        fontWeight: "bold",
+                        cursor: "pointer",
+                        marginTop: "10px"
+                    }}
+                >
+                    Refresh
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div>
@@ -67,7 +95,7 @@ function Browse() {
                     </ul>
                 ) : (
                     <p style={{ color: "#666", fontStyle: "italic" }}>
-                        No recipes found. Try a different search term.
+                            {query ? 'No recipes found. Try a different search term.' : 'No recipes available.'}
                     </p>
                 )}
             </section>

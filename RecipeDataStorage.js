@@ -1,147 +1,136 @@
 import {useState, useEffect} from 'react';
 
 export function useSearchData() {
-	// State to hold the search data, the data storage is an array of objects for now
-	// will be changed later into an api call
-    const [items, setItems] = useState([
-        {
-            id: 1,
-            name: 'Spaghetti Carbonara',
-            ingredients: [
-                { name: 'Spaghetti', quantity: '200g' },
-                { name: 'Eggs', quantity: '2' },
-                { name: 'Pecorino cheese', quantity: '50g' },
-                { name: 'Guanciale', quantity: '100g' },
-                { name: 'Black pepper', quantity: '1 tsp' }
-            ]
-        },
-        {
-            id: 2,
-            name: 'Chicken Alfredo',
-            ingredients: [
-                { name: 'Fettuccine', quantity: '200g' },
-                { name: 'Chicken breast', quantity: '300g' },
-                { name: 'Heavy cream', quantity: '1 cup' },
-                { name: 'Parmesan cheese', quantity: '50g' },
-                { name: 'Garlic', quantity: '2 cloves' }
-            ]
-        },
-        {
-            id: 3,
-            name: 'Vegan Buddha Bowl',
-            ingredients: [
-                { name: 'Quinoa', quantity: '1 cup' },
-                { name: 'Chickpeas', quantity: '200g' },
-                { name: 'Avocado', quantity: '1' },
-                { name: 'Sweet potato', quantity: '1 medium' },
-                { name: 'Kale', quantity: '2 cups' }
-            ]
-        },
-        {
-            id: 4,
-            name: 'Beef Stroganoff',
-            ingredients: [
-                { name: 'Beef sirloin', quantity: '400g' },
-                { name: 'Mushrooms', quantity: '200g' },
-                { name: 'Sour cream', quantity: '1/2 cup' },
-                { name: 'Onion', quantity: '1 medium' },
-                { name: 'Egg noodles', quantity: '200g' }
-            ]
-        },
-        {
-            id: 5,
-            name: 'Caesar Salad',
-            ingredients: [
-                { name: 'Romaine lettuce', quantity: '1 head' },
-                { name: 'Croutons', quantity: '1 cup' },
-                { name: 'Parmesan cheese', quantity: '30g' },
-                { name: 'Caesar dressing', quantity: '1/4 cup' },
-                { name: 'Lemon juice', quantity: '1 tbsp' },
-                { name: 'Black pepper', quantity: '1 tsp' }
-            ]
-        },
-        {
-            id: 6,
-            name: 'Tacos',
-            ingredients: [
-                { name: 'Tortillas', quantity: '6' },
-                { name: 'Ground beef', quantity: '300g' },
-                { name: 'Lettuce', quantity: '1 cup' },
-                { name: 'Tomato', quantity: '1 medium' },
-                { name: 'Cheddar cheese', quantity: '50g' }
-            ]
-        },
-        {
-            id: 7,
-            name: 'Sushi Rolls',
-            ingredients: [
-                { name: 'Sushi rice', quantity: '1 cup' },
-                { name: 'Nori', quantity: '4 sheets' },
-                { name: 'Avocado', quantity: '1' },
-                { name: 'Cucumber', quantity: '1/2' },
-                { name: 'Salmon', quantity: '100g' }
-            ]
-        },
-        {
-            id: 8,
-            name: 'Lentil Soup',
-            ingredients: [
-                { name: 'Lentils', quantity: '1 cup' },
-                { name: 'Carrots', quantity: '2 medium' },
-                { name: 'Celery', quantity: '2 stalks' },
-                { name: 'Onion', quantity: '1 medium' },
-                { name: 'Tomato paste', quantity: '2 tbsp' }
-            ]
-        },
-        {
-            id: 9,
-            name: 'Grilled Cheese Sandwich',
-            ingredients: [
-                { name: 'Bread', quantity: '2 slices' },
-                { name: 'Cheddar cheese', quantity: '50g' },
-                { name: 'Butter', quantity: '1 tbsp' }
-            ]
-        },
-        {
-            id: 10,
-            name: 'Pancakes',
-            ingredients: [
-                { name: 'Flour', quantity: '1 cup' },
-                { name: 'Milk', quantity: '1 cup' },
-                { name: 'Eggs', quantity: '2' },
-                { name: 'Sugar', quantity: '2 tbsp' },
-                { name: 'Baking powder', quantity: '2 tsp' }
-            ]
-        },
-	]);
+
+
+
+	const [items, setItems] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null); // State for error messages
 	// search query state
 	const [query, setQuery] = useState('');
 
 	//selected Recipes State
-    const [selectedItems, setSelectedItems] = useState([]);
+	const [selectedItems, setSelectedItems] = useState([]);
 
-	// filtered items based on search query
-	const filteredItems = items.filter(item =>
-		item.name.toLowerCase().includes(query.toLowerCase()))
-		.slice(0, 5); // limit to 5 results
+	//fetch all meals from api on mount
+	useEffect(() => {
+		const fetchMeals = async () => {
+			try {
+				setLoading(true);
+				const categories = ['Beef', 'Chicken', 'Seafood', 'Vegetarian']; // Sample categories
+				const responses = await Promise.all(
+					categories.map(category =>
+						fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`)
+					)
+				);
+				const data = await Promise.all(responses.map(res => res.json()));
+				const meals = [].concat(...data.map(d => d.meals || [])).filter(meal => meal); // Flatten and remove nulls
+
+				// Deduplicate by idMeal
+				const uniqueMeals = Array.from(new Map(meals.map(meal => [meal.idMeal, meal])).values());
+
+				// Log fetched items for debugging
+				console.log('Fetched meals:', meals);
+
+				// Map API response to our data structure
+				const processedItems = meals.map(meal => ({
+					id: meal.idMeal,
+						name: meal.strMeal,
+					// Note: Full ingredients require separate lookup.php calls per meal.
+					// For efficiency, we'll fetch details lazily when adding to selected.
+					// Placeholder for now; actual ingredients fetched in addToSelected.
+				}));
+				setItems(processedItems);
+			} catch (error) {
+				console.error('Error fetching meals:', error);
+				setError('Failed to load recipes. Please try again later.');
+				setItems([]);//fallback to empty array on error
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchMeals();
+    }, []);
+
+
+
+	// Filtered items based on search query (client-side filter)
+	const filteredItems = items
+		.filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 5); // Limit to 5 results
+
+	// fethc full meal details for ingredients
+	const fetchMealDetails = async (mealId) => {
+		try {
+			const response = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealId}`);
+			if (!response.ok) {
+				throw new Error('Failed to fetch meal details');
+			}
+			const data = await response.json();
+			const meal = data.meals?.[0];
+
+			if (!meal) return null;
+
+			//extract ingredients and measures 
+			const ingredients = [];
+			for (let i = 1; i <= 20; i++) {
+				const ingredient = meal[`strIngredient${i}`];
+				const measure = meal[`strMeasure${i}`];
+				if (ingredient && ingredient.trim() !== '') {
+					ingredients.push({
+						name: ingredient.trim(),
+						quantity: measure ? measure.trim() : 'To taste' // fallback if no measure
+
+					});
+				}
+			}
+			return {
+				...meal,
+				id: meal.idMeal,
+				name: meal.strMeal,
+				ingredients
+			};
+		} catch (error) {
+			console.error('Error fetching meal details:', error);
+			return null;
+		}
+	};
+
 
 	//add a recipe to selected items/recipes
-	const addToSelected = (item) => {
-		setSelectedItems(prev =>
-			prev.some(selected => selected.id === item.id)
-				? prev
-				: [...prev, item]
-		);
+	const addToSelected = async (item) => {
+		//check if already selected
+		if (selectedItems.some(selected => selected.id === item.id)) {
+			return;
+		}
+		let fullItem = item;
+		// if ingredients not present, fetch full details
+		if (!item.ingredients || item.ingredients.length === 0) {
+			fullItem = await fetchMealDetails(item.id);
+			if (!fullItem) {
+				console.error('Failed to fetch full meal details');
+				return;
+			}
+		}
+		setSelectedItems(prev => [...prev, fullItem]);
 	};
+
+		
+	
 
 	const removeFromSelected = (id) => {
 		setSelectedItems(prev => prev.filter(item => item.id !== id));
     }
 
 	return {
-		items, filteredItems, query, setQuery,
+		items,
+		filteredItems,
+		query,
+		setQuery,
 		selectedItems,
 		addToSelected,
-		removeFromSelected
+		removeFromSelected,
+		loading
 };
 }

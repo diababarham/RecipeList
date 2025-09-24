@@ -4,8 +4,16 @@ import IngredientList from './IngredientList';
 import { useState } from 'react';
 
 function RecipeList() {
-    const { selectedItems } = useSearchContext();
+    const { selectedItems, loading } = useSearchContext();
     const [showIngredients, setShowIngredients] = useState(false);
+
+    if (loading) {
+        return (
+            <div style={{ padding: "20px", textAlign: "center" }}>
+                <p>Loading recipes...</p>
+            </div>
+        );
+    }
 
     return (
         <div>
